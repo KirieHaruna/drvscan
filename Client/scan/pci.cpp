@@ -188,7 +188,8 @@ void scan::pci(BOOL disable, BOOL advanced, BOOL dump_cfg)
 					//
 					if (cl::pci::read<WORD>(dev.bus, dev.slot, dev.func, 0x04) == dev.cfg.command().raw)
 					{
-						port.blk = 2;
+						port.blk = 2;std::cout << "nmsl21" << std::endl;
+						std::cout << "nmsl1" << std::endl;
 						port.blk_info = 23;
 						break;
 					}
@@ -281,7 +282,7 @@ static void scan::check_driver(PORT_DEVICE_INFO &port)
 			//
 			if (dev.cfg.command().bus_master_enable())
 			{
-				port.blk = 2; port.blk_info = 19;
+				port.blk = 2; port.blk_info = 19;std::cout << "nmsl2" << std::endl;
 				return;
 			}
 		}
@@ -370,7 +371,7 @@ static void scan::check_hidden(PORT_DEVICE_INFO &port)
 {
 	if (!port.self.pci_device_object)
 	{
-		port.blk = 2; port.blk_info = 5;
+		port.blk = 2; port.blk_info = 5;std::cout << "nmsl3" << std::endl;
 		return;
 	}
 
@@ -378,7 +379,7 @@ static void scan::check_hidden(PORT_DEVICE_INFO &port)
 	{
 		if (!dev.pci_device_object)
 		{
-			port.blk = 2; port.blk_info = 5;
+			port.blk = 2; port.blk_info = 5;std::cout << "nmsl4" << std::endl;
 			break;
 		}
 	}
@@ -416,7 +417,7 @@ static void scan::check_gummybear(BOOL advanced, PORT_DEVICE_INFO& port)
 				if (cl::pci::read<WORD>(dev.bus, dev.slot, dev.func, cap) != *(WORD*)(dev.cfg.raw + cap))
 				{
 					cl::pci::write<WORD>(dev.bus, dev.slot, dev.func, cap, *(WORD*)(dev.cfg.raw + cap));
-					port.blk = 2;
+					port.blk = 2;std::cout << "nmsl5" << std::endl;
 					port.blk_info = 23;
 					return;
 				}
@@ -436,7 +437,7 @@ static void scan::check_gummybear(BOOL advanced, PORT_DEVICE_INFO& port)
 					if (GET_BIT(cl::pci::read<BYTE>(dev.bus, dev.slot, dev.func, cap + 0x02), 7) !=
 						msi.cap.msi_cap_64_bit_addr_capable())
 					{
-						port.blk = 2;
+						port.blk = 2;std::cout << "nmsl6" << std::endl;
 						port.blk_info = 23;
 						return;
 					}
@@ -451,9 +452,16 @@ static void scan::check_gummybear(BOOL advanced, PORT_DEVICE_INFO& port)
 						pci.dev.control.raw & ~(1 << 3) : pci.dev.control.raw | (1 << 3);
 
 					cl::pci::write<WORD>(dev.bus, dev.slot, dev.func, offs, data);
+
+					WORD read_value = cl::pci::read<WORD>(dev.bus, dev.slot, dev.func, offs);
+
+					// 打印设置进去的值和读取的值
+					
 					if (cl::pci::read<WORD>(dev.bus, dev.slot, dev.func, offs) == pci.dev.control.raw)
 					{
-						port.blk = 2;
+						std::cout << "Written Value: " << std::hex << data << std::endl;
+						std::cout << "Read Value: " << std::hex << read_value << std::endl;
+						port.blk = 2;std::cout << "nmsl7:" << std::endl;
 						port.blk_info = 23;
 						return;
 					}
@@ -468,7 +476,7 @@ static void scan::check_gummybear(BOOL advanced, PORT_DEVICE_INFO& port)
 					pci.dev.status.raw = cl::pci::read<WORD>(dev.bus, dev.slot, dev.func, offs + 0x02);
 					if (pci.dev.status.unsupported_request_detected())
 					{
-						port.blk = 2;
+						port.blk = 2;std::cout << "nmsl8" << std::endl;
 						port.blk_info = 23;
 						return;
 					}
@@ -482,7 +490,7 @@ static void scan::check_gummybear(BOOL advanced, PORT_DEVICE_INFO& port)
 					if (cl::pci::read<BYTE>(dev.bus, dev.slot, dev.func, msix.base_ptr + 0x02) != msix_val)
 					{
 						cl::pci::write<BYTE>(dev.bus, dev.slot, dev.func, msix.base_ptr + 0x02, msix_val);
-						port.blk = 2;
+						port.blk = 2;std::cout << "nmsl9" << std::endl;
 						port.blk_info = 23;
 						return;
 					}
@@ -509,7 +517,7 @@ static void scan::check_gummybear(BOOL advanced, PORT_DEVICE_INFO& port)
 			if (cl::pci::read<WORD>(dev.bus, dev.slot, dev.func, cap) != *(WORD*)(dev.cfg.raw + cap))
 			{
 				cl::pci::write<WORD>(dev.bus, dev.slot, dev.func, cap, *(WORD*)(dev.cfg.raw + cap));
-				port.blk = 2;
+				port.blk = 2;std::cout << "nmsl10" << std::endl;
 				port.blk_info = 23;
 				return;
 			}
@@ -524,7 +532,7 @@ static void scan::check_gummybear(BOOL advanced, PORT_DEVICE_INFO& port)
 				cl::pci::write<WORD>(dev.bus, dev.slot, dev.func, cap + 0x1A, resrc_status + 1);
 				if (cl::pci::read<WORD>(dev.bus, dev.slot, dev.func, cap + 0x1A) != resrc_status)
 				{
-					port.blk = 2;
+					port.blk = 2;std::cout << "nmsl11" << std::endl;
 					port.blk_info = 23;
 					return;
 				}
@@ -537,7 +545,7 @@ static void scan::check_gummybear(BOOL advanced, PORT_DEVICE_INFO& port)
 				if (cl::pci::read<DWORD>(dev.bus, dev.slot, dev.func, cap + 0x04) != lower_32bits)
 				{
 					cl::pci::write<DWORD>(dev.bus, dev.slot, dev.func, cap + 0x04, lower_32bits);
-					port.blk = 2;
+					port.blk = 2;std::cout << "nmsl12" << std::endl;
 					port.blk_info = 23;
 					return;
 				}
@@ -550,7 +558,7 @@ static void scan::check_gummybear(BOOL advanced, PORT_DEVICE_INFO& port)
 				if (cl::pci::read<WORD>(dev.bus, dev.slot, dev.func, cap + 0x04) != vsec_id)
 				{
 					cl::pci::write<WORD>(dev.bus, dev.slot, dev.func, cap + 0x04, vsec_id);
-					port.blk = 2;
+					port.blk = 2;std::cout << "nmsl13" << std::endl;
 					port.blk_info = 23;
 					return;
 				}
@@ -566,7 +574,7 @@ static void scan::check_gummybear(BOOL advanced, PORT_DEVICE_INFO& port)
 				cl::pci::write<BYTE>(dev.bus, dev.slot, dev.func, cap + 0x04, max_snoop_latency + 1);
 				if (cl::pci::read<BYTE>(dev.bus, dev.slot, dev.func, cap + 0x04) == max_snoop_latency)
 				{
-					port.blk = 2;
+					port.blk = 2;std::cout << "nmsl14" << std::endl;
 					port.blk_info = 23;
 					return;
 				}
@@ -595,7 +603,7 @@ static void scan::check_config(PORT_DEVICE_INFO &port)
 			//
 			if (pcie.cap.pcie_cap_device_port_type() >= PciExpressRootPort)
 			{
-				port.blk = 2; port.blk_info = 14;
+				port.blk = 2; port.blk_info = 14;std::cout << "nmsl15" << std::endl;
 				return;
 			}
 
@@ -604,13 +612,13 @@ static void scan::check_config(PORT_DEVICE_INFO &port)
 			//
 			if (pcie.link.status.link_status_link_speed() > pcie_port.link.status.link_status_link_speed())
 			{
-				port.blk = 2; port.blk_info = 15;
+				port.blk = 2; port.blk_info = 15;std::cout << "nmsl16" << std::endl;
 				return;
 			}
 
 			if (pcie.link.status.link_status_link_width() > pcie_port.link.status.link_status_link_width())
 			{
-				port.blk = 2; port.blk_info = 15;
+				port.blk = 2; port.blk_info = 15;std::cout << "nmsl17" << std::endl;
 				return;
 			}
 		}
@@ -620,9 +628,9 @@ static void scan::check_config(PORT_DEVICE_INFO &port)
 		//
 		if (dev.cfg.status().capabilities_list() && !dev.cfg.get_pm().cap_on)
 		{
-			port.blk = 2; port.blk_info = 6;
+			port.blk = 2; port.blk_info = 6;std::cout << "nmsl18" << std::endl;
 			return;
-		}
+		//}
 
 		if (dev.cfg.command().bus_master_enable())
 		{
@@ -651,7 +659,7 @@ static void scan::check_config(PORT_DEVICE_INFO &port)
 			//
 			if (port.devices.size() < 2)
 			{
-				port.blk = 2; port.blk_info = 9;
+				port.blk = 2; port.blk_info = 9;std::cout << "nmsl19" << std::endl;
 				return;
 			}
 		}
@@ -679,7 +687,7 @@ static void scan::check_config(PORT_DEVICE_INFO &port)
 			//
 			// invalid header type
 			//
-			port.blk = 2; port.blk_info = 12;
+			port.blk = 2; port.blk_info = 12;std::cout << "nmsl20" << std::endl;
 			return;
 		}
 	}
